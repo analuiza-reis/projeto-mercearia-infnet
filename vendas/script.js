@@ -19,11 +19,20 @@ function gerarNumeroTransacao(){
     return Math.floor(Math.random() * 10000);
 }
 
-function registrarHistoricoAlteracao(aMensagem){
+function registrarHistoricoAlteracao(aMensagem, ehSucesso=true){
     const ulHistoricoAlteracao = document.getElementById("historicoAlteracao");
-    const liHistorico = document.createElement("li");
-    liHistorico.textContent = aMensagem;
-    ulHistoricoAlteracao.appendChild(liHistorico);
+    const divAlertContainer = document.getElementById("alertContainer");
+    divAlertContainer.style.display = "none";
+
+    if(ehSucesso){
+        const liHistorico = document.createElement("li");
+        liHistorico.textContent = aMensagem;
+        ulHistoricoAlteracao.appendChild(liHistorico); 
+    } else {
+    divAlertContainer.style.display = "block";
+    divAlertContainer.className = "alert alert-info";
+    divAlertContainer.innerHTML = "<strong>Atenção! </strong>" + aMensagem;
+    }
 }
 
 function registarVenda(produto, quantidade, precoUnitario){
@@ -37,24 +46,36 @@ function registarVenda(produto, quantidade, precoUnitario){
     if(validaCamposObrigatorios) {
         if(validaQuantidadeProdutos) {
             if(validaPrecoUnitario) {
-                return "["+numeroTransacao+"]"+"Transação registrada! " + produto + ", quantidade: " +quantidade+" unidades, preço unitário R$"+precoUnitario+", data da transação: "+dataTransacao;
+                return {
+                    mensagem: "["+numeroTransacao+"]"+"Transação registrada! " + produto + ", quantidade: " +quantidade+" unidades, preço unitário R$"+precoUnitario+", data da transação: "+dataTransacao,
+                    sucesso: true
+                };
             } else {
-                return "Problema na validação de Preço Unitário!";
+                return {
+                    mensagem: "Problema na validação de Preço Unitário!", 
+                    sucesso: false
+                };
             }
         } else {    
-            return "Problema na validação de quantidade de produtos!";
+            return {
+                mensagem: "Problema na validação de quantidade de produtos!",
+                sucesso: false
+            };
         }
     } else {
-        return "Problema na validação de campos obrigatórios!";
+        return {
+            mensagem: "Problema na validação de campos obrigatórios!",
+            sucesso: false
+        };
     }
 }
 
 function vender(){
     let produto = document.getElementById("produto").value;
     let quantidade = document.getElementById("quantidade").value;
-    let precoUnitario = document.getElementById("precoUnitario").value;
+    let precoUnitario = document.getElementById("preco").value;
 
-    const mensagem = registarVenda(produto, quantidade, precoUnitario);
+    const objeto = registarVenda(produto, quantidade, precoUnitario);
 
-    registrarHistoricoAlteracao(mensagem);
+    registrarHistoricoAlteracao(objeto.mensagem, objeto.sucesso);
 }
